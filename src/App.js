@@ -9,7 +9,7 @@ function App() {
   const framesBeforeBackgroundRefresh = 4;
   const [newWordsStep, setNewWordStep] = useState(0);
   const stepsBeforeAddingNewWordToBackground = 5;
-  const maxWordsToAdd = 50;
+  const maxWordsToAdd = 80;
   const [randomBackgroundWords, setRandomBackgroundWords] = useState([]);
   const [functionNames, setFunctionNames] = useState([
     'handleClick',
@@ -267,6 +267,9 @@ function App() {
               </li>
               <li>
                 <a href="http://sylvainlano.github.io/GravityStar/index.html">Gravity Star</a> - React.three.fiber
+              </li>
+              <li>
+                <a href="http://sylvainlano.github.io/PlanetRescue/index.html">Planet Rescue</a> - Old 2010 Javascript
               </li>
             </ol>
           </div>
