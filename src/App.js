@@ -263,10 +263,13 @@ function App() {
             <h3>Personnal projects:</h3>
             <ol>
               <li>
-                <a href="http://sylvainlano.github.io/HexaSnake/index.html">Hexagonal Snake</a> - Vanilla JavaScript
+                <a href="http://sylvainlano.github.io/VoyageVue/index.html">Voyage Vue</a> - Vue.js & TailwindCSS
               </li>
               <li>
                 <a href="http://sylvainlano.github.io/GravityStar/index.html">Gravity Star</a> - React.three.fiber
+              </li>
+              <li>
+                <a href="http://sylvainlano.github.io/HexaSnake/index.html">Hexagonal Snake</a> - Vanilla JavaScript
               </li>
               <li>
                 <a href="http://sylvainlano.github.io/PlanetRescue/index.html">Planet Rescue</a> - Old 2010 Javascript
