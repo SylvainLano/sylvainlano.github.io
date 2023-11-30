@@ -263,6 +263,9 @@ function App() {
             <h3>Personnal projects:</h3>
             <ol>
               <li>
+                <a href="http://sylvainlano.github.io/EvolvingBoids/index.html">Evolving Boids</a> - Angular.ts & SASS
+              </li>
+              <li>
                 <a href="http://sylvainlano.github.io/VoyageVue/index.html">Voyage Vue</a> - Vue.js & TailwindCSS
               </li>
               <li>
