@@ -17,12 +17,12 @@ export const fragmentShaderPixelatedNeon = `
     uniform float time;
 
     vec3 palette( float t) {
-        vec3 a = vec3(0.5, 0.5, 0.5);
-        vec3 b = vec3(0.5, 0.5, 0.5);
-        vec3 c = vec3(1., 1., 1.);
+        vec3 a = vec3(0.2, 1., 1.);
+        vec3 b = vec3(1., 0.5, 0.2);
+        vec3 c = vec3(1., 0.2, 0.5);
         vec3 d = vec3(0.263, 0.416, 0.557);
 
-        return a + b*cos( 6.28318*(c*t+d) );
+        return a + b*cos( 4.2*(c*t+d) );
     }
 
     void main() {
@@ -33,11 +33,11 @@ export const fragmentShaderPixelatedNeon = `
         vec3 finalColor = vec3(0.0);
 
         // Pixelize result with uv
-        // float pixelSize = 10.0;
-        // float screenSize = min(resolution.x, resolution.y);
-        // uv = floor(uv * screenSize / pixelSize) / screenSize * pixelSize;
+        float pixelSize = 10.0;
+        float screenSize = min(resolution.x, resolution.y);
+        uv = floor(uv * screenSize / pixelSize) / screenSize * pixelSize;
 
-        for (float i = 0.0; i < 3.0; i++) {
+        for (float i = 0.0; i < 4.0; i++) {
             // return the fractionnal part of uv
             uv = fract(uv * 1.5) - 0.5;
 
@@ -48,13 +48,13 @@ export const fragmentShaderPixelatedNeon = `
             vec3 color = palette(length(uv0) + i*0.4 + time*0.1);
 
             // sin of time to create the movement
-            d = sin(d * 8. + time*0.2) / 8.;
+            d = sin(d * 8. + time*0.15) / 8.;
             
             // abs to have inside and outside coloration
             d = abs(d);
 
             // pow to increase the black contrasts
-            d = pow(0.01 / d, 1.2);
+            d = pow(0.01 / d, 1.5);
 
             finalColor += color * d;
         }

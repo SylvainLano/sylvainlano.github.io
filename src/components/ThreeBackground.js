@@ -1,7 +1,7 @@
 // ThreeBackground.js
 import React, { useEffect } from 'react';
 import * as THREE from 'three';
-import { vertexShader, fragmentShaderMandelbrotZoom } from './CustomShaders';
+import { vertexShader, fragmentShaderPixelatedNeon } from './CustomShaders';
 
 const ThreeBackground = React.memo(() => {
   const scene = new THREE.Scene();
@@ -14,7 +14,7 @@ const ThreeBackground = React.memo(() => {
       time: { value: 0.0 }, // Custom uniform for time
     },
     vertexShader,
-    fragmentShader: fragmentShaderMandelbrotZoom,
+    fragmentShader: fragmentShaderPixelatedNeon,
   });
 
   const createCube = () => {
