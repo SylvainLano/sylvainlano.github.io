@@ -9,33 +9,6 @@
   align-items: center;
 }
 
-.background-text {
-  position: absolute;
-  font-family: 'Courier New', monospace;
-  font-size: 32px;
-  font-weight: bolder;
-  color: #666;
-  top: -15px;
-  left: -5px;
-  pointer-events: none;
-  word-wrap: break-word;
-  white-space: pre-line;
-  user-select: none;
-	box-shadow: inset 0px 0px 20px 20px rgba(0, 0, 0, 0.5);
-}
-
-.background-text .function-name {
-  color: #38AECC;
-}
-
-.background-text .quality-name {
-  color: #F72585;
-}
-
-.background-text .technology-name {
-  color: #28E4B2;
-}
-
 .info-box {
   font-family: 'Courier New', monospace;
   background-color: #fff; /* Set the background color to white */
@@ -44,6 +17,7 @@
   border-radius: 20px;
   cursor: pointer;
   transition: background-color 0.3s;
+  position: absolute;
 }
 
 .info-box:hover {

@@ -1,0 +1,27 @@
+.background-text {
+    position: absolute;
+    font-family: 'Courier New', monospace;
+    font-size: 32px;
+    font-weight: bolder;
+    color: rgba(128, 256, 128, 0.2);
+    background: rgba(0, 0, 0, .5);
+    top: -15px;
+    left: -5px;
+    pointer-events: none;
+    word-wrap: break-word;
+    white-space: pre-line;
+    user-select: none;
+      box-shadow: inset 0px 0px 20px 20px rgba(0, 0, 0, 0.5);
+  }
+  
+  .background-text .function-name {
+    color: rgba(56,174,204, 0.5);
+  }
+  
+  .background-text .quality-name {
+    color: rgba(247,37,133,0.5);
+  }
+  
+  .background-text .technology-name {
+    color: rgba(40,228,178,0.5);
+  }
