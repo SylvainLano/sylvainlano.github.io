@@ -1,37 +1,19 @@
+html,
+body {
+  margin: 0;
+  background: #000;
+}
+
 .App {
   position: relative;
+  /* Own stacking context: the background text (z-index: -1, as in the original)
+     stays above the page's black background instead of disappearing under it */
+  z-index: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
-  font-size: 16px;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.info-box {
-  font-family: 'Courier New', monospace;
-  background-color: #fff; /* Set the background color to white */
-  color: #000; /* Set the text color to black */
-  border: 5px solid #0C0A3E; /* Add a 5px solid border with the desired color */
-  border-radius: 20px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  position: absolute;
-}
-
-.info-box:hover {
-  border: 5px solid #38AECC;
-}
-
-.info-box .full-display {
-  padding: 20px 30px;
-}
-
-.info-box .empty-display {
-  padding: 10px 20px;
-}
-
-.blur-background {
-  filter: blur(2px); /* Adjust the blur radius as needed */
 }

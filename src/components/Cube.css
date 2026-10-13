@@ -1,0 +1,307 @@
+/* Cube.css */
+.cube-scene {
+  /* Big: the cube fills most of the screen and shrinks only while turning */
+  --cube-size: min(90vh, 90vw);
+  --half: calc(var(--cube-size) / 2);
+  --navy: #0c0a3e;
+  --cyan: #38aecc;
+  --pink: #f72585;
+  --mint: #28e4b2;
+
+  width: var(--cube-size);
+  height: var(--cube-size);
+  perspective: calc(var(--cube-size) * 1.8);
+  font-family: 'Courier New', monospace;
+  font-size: calc(var(--cube-size) / 38);
+  position: relative;
+  z-index: 1;
+  touch-action: none;
+}
+
+.cube {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Hit-testing in 3D is unreliable: only the active face receives the
+   pointer; events still bubble to the scene, so swipes keep working. */
+.cube-scene,
+.cube,
+.face {
+  pointer-events: none;
+}
+.face.is-active {
+  pointer-events: auto;
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  /* No overflow: hidden here — on a 3D-transformed element it breaks
+     click detection in Chromium. Children are positioned inside anyway. */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: #05040f;
+}
+
+.face--front  { transform: translateZ(var(--half)); }
+.face--back   { transform: rotateY(180deg) translateZ(var(--half)); }
+.face--right  { transform: rotateY(90deg) translateZ(var(--half)); }
+.face--left   { transform: rotateY(-90deg) translateZ(var(--half)); }
+.face--top    { transform: rotateX(90deg) translateZ(var(--half)); }
+.face--bottom { transform: rotateX(-90deg) translateZ(var(--half)); }
+
+.face__shader {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+/* Darkening driven by the face orientation (set from Cube.js) */
+.face__shade {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Bevelled edges: a light rim on top/left, a dark rim on bottom/right */
+.face__edge {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow:
+    inset 3px 3px 0 rgba(255, 255, 255, 0.35),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.55),
+    inset 0 0 calc(var(--cube-size) / 12) rgba(0, 0, 0, 0.55);
+  outline: 2px solid rgba(12, 10, 62, 0.9);
+}
+
+/* Fallback when WebGL is not available */
+.no-webgl .face--front  { background: radial-gradient(circle, #1b3a6b, #05040f); }
+.no-webgl .face--right  { background: radial-gradient(circle, #0d4a42, #02080a); }
+.no-webgl .face--left   { background: radial-gradient(circle, #4a0d3a, #06010a); }
+.no-webgl .face--top    { background: radial-gradient(circle, #2a0d4a, #02000a); }
+.no-webgl .face--bottom { background: radial-gradient(circle, #2a2560, #05050f); }
+.no-webgl .face--back   { background: radial-gradient(circle, #1d3b55, #05040f); }
+
+.face__content {
+  position: absolute;
+  inset: 0;
+}
+
+/* ---------- Cards: opaque, in the spirit of the original info box ---------- */
+.card {
+  position: absolute;
+  inset: 13% 13%;
+  box-sizing: border-box;
+  padding: 1.3em 1.5em;
+  background: #fff;
+  color: #000;
+  border: 5px solid var(--navy);
+  border-radius: 20px;
+  overflow: hidden; /* never scrolls: text is shrunk to fit instead */
+  font-size: calc(1em * var(--fit, 1));
+  transition: border-color 0.3s;
+  box-shadow: 0 0.6em 1.6em rgba(0, 0, 0, 0.45);
+}
+
+.card:hover {
+  border-color: var(--cyan);
+}
+
+.card h1,
+.card h2 {
+  margin: 0 0 0.15em;
+  font-size: 1.9em;
+  line-height: 1.1;
+}
+
+.card p {
+  margin: 0.5em 0;
+  line-height: 1.4;
+}
+
+.card a {
+  color: #1d3fb8;
+  font-weight: bold;
+}
+
+.card a:hover,
+.card a:focus-visible {
+  color: var(--cyan);
+}
+
+.card button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.card__role,
+.card__intro,
+.card__year {
+  margin-top: 0;
+  color: #4a5568;
+}
+
+.card__contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2em;
+  margin-top: 1em;
+}
+
+/* ---------- Edge tabs: they sit on the edge they rotate toward ---------- */
+.edge-tab {
+  position: absolute;
+  z-index: 1;
+  padding: 0.45em 0.9em;
+  background: #fff;
+  color: #000;
+  border: 3px solid var(--navy);
+  border-radius: 12px;
+  font: inherit;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.edge-tab:hover,
+.edge-tab:focus-visible {
+  border-color: var(--cyan);
+  background: #eaf8fc;
+  outline: none;
+}
+
+.edge-tab--top    { top: 2.5%;    left: 50%; transform: translateX(-50%); }
+.edge-tab--bottom { bottom: 2.5%; left: 50%; transform: translateX(-50%); }
+
+/* Side tabs are vertical so they take almost no width */
+.edge-tab--left,
+.edge-tab--right {
+  top: 50%;
+  writing-mode: vertical-rl;
+  padding: 0.9em 0.45em;
+}
+.edge-tab--left  { left: 2.5%;  transform: translateY(-50%); }
+/* Arrows stay upright inside vertical tabs */
+.edge-tab__arrow {
+  text-combine-upright: all;
+}
+.edge-tab--right { right: 2.5%; transform: translateY(-50%); }
+
+/* ---------- Project lists ---------- */
+.project-list {
+  list-style: none;
+  margin: 0.7em 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45em;
+}
+
+.project-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.5em 0.75em;
+  background: #f3f5f9;
+  border: 2px solid #d5dbe6;
+  border-radius: 10px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.project-item:hover,
+.project-item:focus-visible {
+  border-color: var(--cyan);
+  background: #eaf8fc;
+  outline: none;
+}
+
+.project-item__name {
+  display: block;
+  font-weight: bold;
+  font-size: 1.08em;
+}
+
+.project-item__summary {
+  display: block;
+  color: #4a5568;
+  font-size: 0.88em;
+  margin-top: 0.15em;
+}
+
+.project-item--more {
+  text-align: center;
+  border-style: dashed;
+}
+
+/* ---------- Project sheet (back face) ---------- */
+.card__back {
+  background: #fff;
+  border: 3px solid var(--navy);
+  border-radius: 10px;
+  padding: 0.25em 0.7em;
+  margin-bottom: 0.7em;
+  font-weight: bold;
+}
+
+.card__back:hover,
+.card__back:focus-visible {
+  border-color: var(--cyan);
+  outline: none;
+}
+
+.card__tech {
+  list-style: none;
+  padding: 0;
+  margin: 0.5em 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em;
+}
+
+.card__tech li {
+  padding: 0.12em 0.6em;
+  border-radius: 1em;
+  border: 2px solid var(--navy);
+  font-size: 0.88em;
+}
+
+.card__summary {
+  font-weight: bold;
+}
+
+.card__open {
+  display: inline-block;
+  margin-top: 0.6em;
+}
+
+/* ---------- Small screens ---------- */
+@media (max-width: 600px) {
+  .cube-scene {
+    --cube-size: min(96vw, 90vh);
+    font-size: calc(var(--cube-size) / 30);
+  }
+  .card {
+    inset: 12% 11%;
+    padding: 0.9em 1em;
+    border-width: 4px;
+  }
+}
+
+/* The home card wraps its (short) content and stays centred */
+.card--home {
+  inset: auto 13%;
+  top: 50%;
+  transform: translateY(-50%);
+  max-height: 74%;
+}

@@ -1,64 +1,55 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import './App.css';
 import BackgroundText from './components/BackgroundText';
-import BackgroundBlur from './components/BackgroundBlur';
-import ThreeBackground from './components/ThreeBackground';
+import Cube from './components/Cube';
+
+// ---------- Mobile background rhythm (desktop follows the mouse, as before) ----------
+// The background refreshes once every 6 calls to nextStep(), so these are the
+// delays between two *refreshes*; each one is split into 6 calls.
+const MOBILE_SLOW_MS = 1800;     // delay during the long slow phase
+const MOBILE_FAST_MS = 90;       // shortest delay, at the peak of a wave
+const MOBILE_CYCLE_S = 16;       // length of one wave cycle
+const MOBILE_BURST_SHARE = 0.18; // part of the cycle spent accelerating then slowing
+const CALLS_PER_REFRESH = 6;
+
+// Long slow phases broken by a short wave (a sine bump): faster, then slower again
+function mobileRefreshDelay(seconds) {
+  const phase = (seconds % MOBILE_CYCLE_S) / MOBILE_CYCLE_S;
+  if (phase >= MOBILE_BURST_SHARE) return MOBILE_SLOW_MS;
+  const bump = Math.sin(Math.PI * (phase / MOBILE_BURST_SHARE)); // 0 → 1 → 0
+  return MOBILE_SLOW_MS - (MOBILE_SLOW_MS - MOBILE_FAST_MS) * bump * bump;
+}
 
 function App() {
   const backgroundTextRef = useRef(null);
-  const [showInfo, setShowInfo] = useState(false);
-    
-  // Function to update the background text when the mouse moves
+
+  // Desktop: the background text moves when the mouse moves (original behaviour)
   const handleMouseMove = () => {
-    // Call the nextStep method of the ChildComponent
     if (backgroundTextRef.current) {
       backgroundTextRef.current.nextStep();
     }
   };
 
-  // Function to toggle the display of the info box
-  const toggleInfo = () => {
-    setShowInfo(!showInfo);
-  };
+  // Mobile (no mouse): a timer drives the background in waves
+  useEffect(() => {
+    const coarse = window.matchMedia('(pointer: coarse)').matches;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!coarse || reduceMotion) return undefined;
+    const start = performance.now();
+    let timer;
+    const tick = () => {
+      if (backgroundTextRef.current) backgroundTextRef.current.nextStep();
+      const delay = mobileRefreshDelay((performance.now() - start) / 1000) / CALLS_PER_REFRESH;
+      timer = setTimeout(tick, delay);
+    };
+    tick();
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <div
-      className="App"
-      onMouseMove={handleMouseMove}
-      onClick={toggleInfo}
-    >
-      <ThreeBackground />
-      <div className="info-box">
-        {showInfo && (
-          <div className="full-display">
-            <h2 style={{ display: 'inline-block', marginRight: '10px' }}>Sylvain Lano</h2>
-            <span style={{ display: 'inline-block' }}>- Software Engineer</span>
-            <h3>Personnal projects:</h3>
-            <ol>
-              <li>
-                <a href="http://sylvainlano.github.io/EvolvingBoids/index.html">Evolving Boids</a> - Angular.ts & SASS
-              </li>
-              <li>
-                <a href="http://sylvainlano.github.io/VoyageVue/index.html">Voyage Vue</a> - Vue.js & TailwindCSS
-              </li>
-              <li>
-                <a href="http://sylvainlano.github.io/GravityStar/index.html">Gravity Star</a> - React.three.fiber
-              </li>
-              <li>
-                <a href="http://sylvainlano.github.io/HexaSnake/index.html">Hexagonal Snake</a> - Vanilla JavaScript
-              </li>
-              <li>
-                <a href="http://sylvainlano.github.io/PlanetRescue/index.html">Planet Rescue</a> - Old 2010 Javascript
-              </li>
-            </ol>
-          </div>
-        )}
-        {!showInfo && (
-          <div className="empty-display">
-            <h2>Sylvain Lano</h2>
-          </div>
-        )}
-      </div>
+    <div className="App" onMouseMove={handleMouseMove}>
+      <BackgroundText ref={backgroundTextRef} />
+      <Cube />
     </div>
   );
 }

@@ -77,7 +77,18 @@ const BackgroundText = forwardRef(({ showInfo }, ref) => {
     'Docker',
     'Hibernate',
     'MongoDB',
-    'Cucumber'
+    'Cucumber',
+    'Symfony',
+    'Keycloak',
+    'PostgreSQL',
+    'JPA',
+    'Vue.js',
+    'Vite',
+    'SASS',
+    'TailwindCSS',
+    'GLSL',
+    'RxJS',
+    'i18n'
     ]);
 
     // Function to choose a random React function names to display in the background
@@ -227,8 +238,12 @@ const BackgroundText = forwardRef(({ showInfo }, ref) => {
                 setRefreshBackgroundTimer ((prevRefreshBackgroundTimer) => prevRefreshBackgroundTimer + 1);
                 if ( refreshBackgroundTimer > framesBeforeBackgroundRefresh ) {
                     const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-                    let randomText = Array.from({ length: 2500 }, () =>
-                    characters.charAt(Math.floor(Math.random() * 86))
+                    // Enough characters to cover the whole window (32px Courier: ~19px wide, ~37px tall),
+                    // instead of a fixed 2500 that left large screens partly empty
+                    const columns = Math.ceil((window.innerWidth + 10) / 19) + 2;
+                    const rows = Math.ceil((window.innerHeight + 30) / 36) + 2;
+                    let randomText = Array.from({ length: columns * rows }, () =>
+                    characters.charAt(Math.floor(Math.random() * characters.length))
                     ).join('');
                     randomText = addWordsInBackgroundText(randomText);
                     setBackgroundText(randomText);
