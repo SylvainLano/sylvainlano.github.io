@@ -10,7 +10,15 @@
 // Only "active" faces are redrawn every frame; the others keep their last image.
 // The source of a face can be swapped at any time (the back face changes with
 // the domain it is reached from).
-import * as THREE from 'three';
+import {
+  WebGLRenderer,
+  Scene,
+  OrthographicCamera,
+  Mesh,
+  PlaneGeometry,
+  ShaderMaterial,
+  Vector2,
+} from 'three';
 import { vertexShader } from './CustomShaders';
 
 const TIME_SCALE = 0.6; // matches the old "+0.01 per frame" speed at 60 fps
@@ -27,10 +35,10 @@ class ShaderHub {
   init() {
     if (this.renderer || this.failed) return !this.failed;
     try {
-      this.renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false });
-      this.scene = new THREE.Scene();
-      this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-      this.mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2));
+      this.renderer = new WebGLRenderer({ antialias: false, alpha: false });
+      this.scene = new Scene();
+      this.camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
+      this.mesh = new Mesh(new PlaneGeometry(2, 2));
       this.scene.add(this.mesh);
       return true;
     } catch (e) {
@@ -46,9 +54,9 @@ class ShaderHub {
       return { painter: source.painter(), material: null, scale: source.scale || 1 };
     }
     if (!this.init()) return null;
-    const material = new THREE.ShaderMaterial({
+    const material = new ShaderMaterial({
       uniforms: {
-        resolution: { value: new THREE.Vector2() },
+        resolution: { value: new Vector2() },
         time: { value: 0 },
       },
       vertexShader,

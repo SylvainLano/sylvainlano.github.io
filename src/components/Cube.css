@@ -205,6 +205,8 @@
   margin: 0.7em 0 0;
   padding: 0;
   display: grid;
+  /* minmax(0, …): a long one-line summary must not widen the list past the card */
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.45em;
 }
 
@@ -235,8 +237,12 @@
 .project-item__summary {
   display: block;
   color: #4a5568;
-  font-size: 0.88em;
+  font-size: 0.8em;
   margin-top: 0.15em;
+  /* One line: the full story is on the project's own face */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .project-item--more {
@@ -285,6 +291,23 @@
   margin-top: 0.6em;
 }
 
+/* "Start reading": opens the reader, so it looks like a button, not a link */
+.card .card__read {
+  margin-right: 1em;
+  padding: 0.35em 0.9em;
+  border: 2px solid #1d3fb8;
+  border-radius: 999px;
+  background: #1d3fb8;
+  color: #fff;
+  font-weight: bold;
+  transition: background 0.2s, border-color 0.2s;
+}
+.card .card__read:hover,
+.card .card__read:focus-visible {
+  background: var(--cyan);
+  border-color: var(--cyan);
+}
+
 /* ---------- Small screens ---------- */
 @media (max-width: 600px) {
   .cube-scene {
@@ -304,4 +327,162 @@
   top: 50%;
   transform: translateY(-50%);
   max-height: 74%;
+}
+
+/* ---------- Detailed project sheet ---------- */
+.card--sheet {
+  inset: 8% 9%;
+}
+
+.card__image {
+  display: block;
+  /* The 5:1 ratio is for the picture itself, not the picture plus its border:
+     content-box keeps the inside exactly 5:1, so a banner is never cropped. */
+  box-sizing: content-box;
+  width: calc(100% - 6px);
+  height: auto;
+  aspect-ratio: 5 / 1; /* banners are made at 5:1, so nothing is ever cropped */
+  object-fit: cover;
+  object-position: center top; /* titles and logos sit at the top of the banners */
+  border: 3px solid var(--navy);
+  border-radius: 10px;
+  margin-bottom: 0.7em;
+  background: #eef1f6;
+}
+
+.card__heading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6em;
+  flex-wrap: wrap;
+}
+
+.card__heading .card__year {
+  color: #4a5568;
+}
+
+.card__section h3 {
+  margin: 0.75em 0 0.1em;
+  font-size: 0.85em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #1d7fa0;
+}
+
+.card__section p {
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .card--sheet {
+    inset: 3%;
+    padding: 0.8em 0.9em;
+  }
+}
+
+/* ---------- The other side ---------- */
+/* The name turns the cube around; it stays a heading, just clickable */
+.card__name {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.card .card__name:hover,
+.card .card__name:focus-visible {
+  color: #1d7fa0;
+  outline: none;
+}
+
+/* The discreet way round: a small button in the bottom right corner */
+.flip-tab {
+  position: absolute;
+  z-index: 1;
+  right: 2.5%;
+  bottom: 2.5%;
+  width: 2.2em;
+  height: 2.2em;
+  padding: 0;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  background: rgba(12, 10, 62, 0.55);
+  color: rgba(255, 255, 255, 0.7);
+  font: inherit;
+  font-size: 1.1em;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, transform 0.4s;
+}
+.flip-tab:hover,
+.flip-tab:focus-visible {
+  color: #fff;
+  border-color: var(--cyan);
+  transform: rotate(180deg);
+  outline: none;
+}
+
+/* The other side's home card wears the colours of the passions */
+.card--other { border-color: var(--pink); }
+.card--other:hover { border-color: var(--mint); }
+
+/* Top of the coaster ranking, on the Coasters face */
+.coaster-top {
+  list-style: none;
+  margin: 0.7em 0 0.4em;
+  padding: 0;
+  display: grid;
+  gap: 0.35em;
+}
+.coaster-top li {
+  display: grid;
+  grid-template-columns: 1.6em minmax(0, 1fr) auto;
+  grid-template-areas: 'rank name score' 'rank park score';
+  column-gap: 0.6em;
+  align-items: center;
+  padding: 0.4em 0.7em;
+  background: #f3f5f9;
+  border: 2px solid #d5dbe6;
+  border-radius: 10px;
+}
+.coaster-top__rank { grid-area: rank; font-weight: bold; font-size: 1.3em; color: var(--pink); }
+.coaster-top__name { grid-area: name; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.coaster-top__park { grid-area: park; font-size: 0.8em; color: #4a5568; }
+.coaster-top__score { grid-area: score; font-weight: bold; color: #1d7fa0; }
+
+/* Reading: authors in boxes, one box per kind of book */
+.shelves {
+  list-style: none;
+  margin: 0.7em 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45em;
+}
+.shelves li {
+  padding: 0.45em 0.75em 0.55em;
+  background: #f3f5f9;
+  border: 2px solid #d5dbe6;
+  border-left: 6px solid var(--pink);
+  border-radius: 10px;
+}
+.shelves__title {
+  display: block;
+  font-size: 0.8em;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #1d7fa0;
+}
+.shelves__authors { display: block; margin-top: 0.15em; font-weight: bold; }
+.shelves__authors span + span::before { content: ' · '; color: var(--pink); font-weight: normal; }
+
+/* Version and last update, at the foot of the home card */
+.card .card__stamp {
+  margin: 0.9em 0 0;
+  font-size: 0.72em;
+  letter-spacing: 0.04em;
+  color: #6b7486;
 }

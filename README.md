@@ -1,70 +1,37 @@
-# Getting Started with Create React App
+# sylvainlano.github.io
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The personal site of Sylvain Lano: a cube you turn to reach each side of what I do.
 
-## Available Scripts
+- **Home** (front), **Dev** (right), **Music** (left), **Games** (top) and **Writing** (bottom),
+  each face with its own shader in the background.
+- **Project sheets** on the back face, one per project.
+- **A reader** for my texts in French: letters, short stories, satire, chronicles and a fantasy novel.
+- **The other side**: click my name, or the small ↻ in the corner of the home face, and the cube turns
+  around to coasters, food, games and books.
 
-In the project directory, you can run:
+## Running it
 
-### `npm start`
+```
+npm install
+npm run dev       # local server on http://localhost:3000
+npm run build     # production build in dist/
+npm run preview   # serve the build locally
+npm run deploy    # build, then publish dist/ to GitHub Pages
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Where things live
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+| What | File |
+| --- | --- |
+| Profile, domains, projects, the other side | `src/data/content.js` |
+| Texts of the reader (catalogue) | `src/data/texts.js`, texts in `public/texts/` |
+| Coaster ranking | `src/data/coasters.js` |
+| Words in the scrolling background | `src/data/backgroundWords.js` |
+| The cube | `src/components/Cube.jsx`, `Cube.css` |
+| Face shaders | `src/components/CustomShaders.js`, drawn by `shaderHub.js` |
+| Reader, coaster ranking | `src/components/Reader.jsx`, `Coasters.jsx` |
 
-### `npm test`
+The version shown on the home card comes from `package.json`, and the "Updated" month from the day of the
+build.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Built with React, Vite and three.js. Fonts under the SIL Open Font License (see `public/fonts`).

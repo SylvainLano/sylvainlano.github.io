@@ -221,14 +221,23 @@ export const fragmentShaderInk = `
 
     void main() {
         float px = max(2.0, floor(min(resolution.x, resolution.y) / 160.0));
-        vec2 g = floor(vec2(gl_FragCoord.x, resolution.y - gl_FragCoord.y) / px);
 
         // Character cells: 6 x 10 big pixels (5 x 7 glyph + spacing).
+        // The grid is anchored to the BOTTOM edge: the last row always ends
+        // exactly at the bottom of the face, and the leftover partial row (if
+        // the height is not a multiple of a line) is cut off at the top.
+        // Anchored to the top, that leftover could leave an empty line under
+        // the one being typed, depending on the window size.
+        float heightPx = resolution.y / px;               // face height, in big pixels
+        float rows = ceil(heightPx / 10.0);               // rows touching the face
+        float shift = rows * 10.0 - heightPx;             // part of row 0 hidden above the top
+        vec2 g = floor(vec2(gl_FragCoord.x / px, (resolution.y - gl_FragCoord.y) / px + shift));
+
         // Lines are 8 characters wider than the screen and start 4 characters
         // off-screen, so the text runs past both edges.
         float overflow = 4.0;
         float cols = floor(resolution.x / px / 6.0) + 2.0 * overflow;
-        float lastRow = floor(resolution.y / px / 10.0) - 1.0; // last fully visible row
+        float lastRow = rows - 1.0;                       // the bottom row: always fully visible
         float col = floor(g.x / 6.0) + overflow;
         float row = floor(g.y / 10.0);
         vec2 l = vec2(mod(g.x, 6.0), mod(g.y, 10.0));
@@ -643,6 +652,267 @@ export const fragmentShaderTracker = `
                 if (ch == 19.0) ink = vec3(0.3, 0.33, 0.55);         // empty fields are dimmer
             }
             if (ch < 19.5 && glyphPixel(ch, local) > 0.5) col = ink;
+        }
+
+        gl_FragColor = vec4(col, 1.0);
+    }
+`;
+
+// THE OTHER SIDE, RIGHT — coasters. A neon track scrolls by, supports and all,
+// while a little train rides it up and down.
+export const fragmentShaderCoaster = `
+    ${common}
+
+    // Height of the track at world position x
+    float track(float x) {
+        return -0.3 + 0.3 * sin(x * 1.3) + 0.17 * sin(x * 2.9 + 1.0) + 0.07 * sin(x * 5.3 + 2.0);
+    }
+
+    float box(vec2 p, vec2 c, vec2 h) {
+        vec2 d = abs(p - c) - h;
+        return step(max(d.x, d.y), 0.0);
+    }
+
+    void main() {
+        vec2 uv = pixelate(vPosition.xy, 4.0);
+        uv.x *= resolution.x / resolution.y;
+        float t = time * 0.8;
+        const float SCALE = 1.6;          // world units per screen unit
+        float wx = uv.x * SCALE + t;
+
+        // Night sky, a few stars
+        vec3 col = mix(vec3(0.02, 0.0, 0.05), vec3(0.09, 0.02, 0.16), (uv.y + 1.0) * 0.5);
+        vec2 sg = floor((uv + vec2(t * 0.05, 0.0)) * 40.0);
+        float star = step(0.985, hash12(sg)) * step(0.0, uv.y);
+        col += star * vec3(0.7, 0.7, 1.0) * (0.5 + 0.5 * sin(time * 3.0 + hash12(sg) * 40.0));
+
+        float y = track(wx);
+        float slope = (track(wx + 0.01) - track(wx - 0.01)) / 0.02 * SCALE;
+        float d = abs(uv.y - y) / sqrt(1.0 + slope * slope);
+
+        // Supports: thin cyan columns from the ground up to the track
+        float column = step(fract(wx * 2.5), 0.06) * step(uv.y, y - 0.02);
+        col += column * vec3(0.1, 0.55, 0.75) * (0.35 + 0.25 * (uv.y + 1.0));
+
+        // Rails: a pink neon line with its glow
+        col += vec3(1.0, 0.2, 0.6) * (smoothstep(0.018, 0.0, d) + 0.004 / max(d, 0.004));
+
+        // The train: three cars riding the track, crossing the face from left to right
+        // (the card hides the middle, so it shows on its way in and out)
+        float head = mod(time * 0.45, 3.2) - 1.4;
+        for (int k = 0; k < 3; k++) {
+            float cx = head - float(k) * 0.13;
+            float cy = track(cx * SCALE + t) + 0.045;
+            col = mix(col, vec3(0.25, 1.0, 0.55), box(uv, vec2(cx, cy), vec2(0.055, 0.03)));
+        }
+
+        // Ground glow
+        col += vec3(0.5, 0.1, 0.8) * 0.006 / max(abs(uv.y + 0.97), 0.006);
+
+        gl_FragColor = vec4(col, 1.0);
+    }
+`;
+
+// THE OTHER SIDE, FRONT — the world turned over: cold fog, spores drifting up
+// instead of falling, dark tendrils, and red lightning in the clouds.
+export const fragmentShaderUpsideDown = `
+    ${common}
+
+    // Value noise on the stable hash: the sin-based one breaks into blocks
+    // on many real GPUs once fbm multiplies its inputs
+    float vnoise(vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+        f = f * f * (3.0 - 2.0 * f);
+        float a = hash12(i);
+        float b = hash12(i + vec2(1.0, 0.0));
+        float c = hash12(i + vec2(0.0, 1.0));
+        float d = hash12(i + vec2(1.0, 1.0));
+        return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+    }
+
+    float sfbm(vec2 p) {
+        float v = 0.0;
+        float a = 0.5;
+        mat2 r = mat2(0.8, 0.6, -0.6, 0.8);   // rotate each octave: no grid alignment
+        for (int i = 0; i < 5; i++) {
+            v += a * vnoise(p);
+            p = r * p * 2.02 + 17.0;
+            a *= 0.5;
+        }
+        return v;
+    }
+
+    void main() {
+        // No pixelation here: the other side is soft and foggy
+        vec2 uv = vPosition.xy;
+        uv.x *= resolution.x / resolution.y;
+        float t = time;
+
+        // Cold, sickly sky, darker at the bottom
+        vec3 col = mix(vec3(0.01, 0.03, 0.05), vec3(0.06, 0.10, 0.14), (uv.y + 1.0) * 0.5);
+
+        // Drifting fog
+        float fog = sfbm(uv * 1.6 + vec2(t * 0.04, -t * 0.02));
+        col += vec3(0.12, 0.18, 0.22) * smoothstep(0.3, 0.85, fog) * 1.1;
+
+        // Red lightning, now and then, lighting the clouds from above
+        float beat = floor(t * 0.7);
+        float strike = step(0.72, hash12(vec2(beat, 3.1)));
+        float flash = strike * exp(-fract(t * 0.7) * 9.0) * (0.6 + 0.4 * sin(t * 60.0));
+        float clouds = sfbm(uv * 2.2 + vec2(-t * 0.03, 0.0));
+        col += vec3(0.9, 0.08, 0.05) * flash * smoothstep(0.4, 0.9, clouds) * smoothstep(-0.2, 1.0, uv.y) * 1.4;
+        col += vec3(0.25, 0.02, 0.02) * smoothstep(0.55, 0.95, clouds) * smoothstep(0.2, 1.0, uv.y) * 0.5;
+
+        // Tendrils creeping up from the bottom and down from the top
+        float vine = sfbm(vec2(uv.x * 3.0, uv.y * 1.2 + t * 0.03));
+        float reach = smoothstep(-0.55, -1.0, uv.y) + smoothstep(0.6, 1.0, uv.y) * 0.7;
+        float edge = 1.0 - reach * 0.75 - (vine + 0.25 * reach);
+        col = mix(col, vec3(0.0, 0.01, 0.015), smoothstep(0.02, -0.02, edge));
+
+        // Spores and ash floating upward: few, large and soft
+        for (int i = 0; i < 3; i++) {
+            float fi = float(i);
+            float size = 7.0 + fi * 4.0;
+            vec2 p = uv * size + vec2(sin(t * 0.25 + fi * 2.0 + uv.y * 2.0) * 0.4, -t * (0.25 + fi * 0.12));
+            vec2 id = floor(p);
+            vec2 f = fract(p) - 0.5;
+            float h = hash12(id + fi * 17.0);
+            if (h > 0.86) {
+                vec2 o = vec2(hash12(id + 3.7) - 0.5, hash12(id + 9.1) - 0.5) * 0.5;
+                float d = length(f - o);
+                float glow = smoothstep(0.22, 0.0, d) * (0.5 + 0.5 * sin(t * 1.5 + h * 30.0));
+                col += vec3(0.62, 0.70, 0.74) * glow * (0.45 - fi * 0.1);
+            }
+        }
+
+        gl_FragColor = vec4(col, 1.0);
+    }
+`;
+
+// THE OTHER SIDE, LEFT — tea and spices. Steam rising in curls over a dark,
+// warm brew, with a few specks of pepper and chilli floating by.
+export const fragmentShaderTea = `
+    ${common}
+
+    void main() {
+        vec2 uv = pixelate(vPosition.xy, 4.0);
+        uv.x *= resolution.x / resolution.y;
+        float t = time;
+
+        vec3 col = mix(vec3(0.10, 0.04, 0.01), vec3(0.03, 0.01, 0.0), (uv.y + 1.0) * 0.5);
+
+        // Steam: soft curls rising, swaying more as they climb
+        float steam = 0.0;
+        for (int i = 0; i < 5; i++) {
+            float fi = float(i);
+            float x0 = -0.9 + fi * 0.45;
+            float y = uv.y + 1.0;
+            float sway = sin(y * 3.0 - t * 1.2 + fi * 1.7) * 0.07 * y + sin(y * 7.0 - t * 2.0 + fi) * 0.02 * y;
+            float d = abs(uv.x - x0 - sway);
+            float fade = smoothstep(2.0, 0.2, y) * (0.6 + 0.4 * noise(vec2(fi * 5.0, y * 2.0 - t)));
+            steam += smoothstep(0.06 + 0.04 * y, 0.0, d) * fade;
+        }
+        col += vec3(0.95, 0.80, 0.60) * steam * 0.45;
+
+        // The brew glowing at the bottom
+        col += vec3(0.75, 0.32, 0.05) * 0.012 / max(abs(uv.y + 0.95), 0.012);
+
+        // Specks of spice drifting down
+        vec2 p = uv * 14.0 + vec2(sin(t * 0.2) * 0.5, t * 0.5);
+        vec2 id = floor(p);
+        float h = hash12(id);
+        if (h > 0.93) {
+            float d = length(fract(p) - 0.5);
+            vec3 spice = h > 0.965 ? vec3(0.85, 0.15, 0.05) : vec3(0.02, 0.01, 0.0);
+            col = mix(col, spice, smoothstep(0.18, 0.08, d));
+        }
+
+        gl_FragColor = vec4(col, 1.0);
+    }
+`;
+
+// THE OTHER SIDE, TOP — games and streaming. An old screen in Twitch purple:
+// scanlines, a rolling bar, a blinking LIVE dot and a chat scrolling up the side.
+export const fragmentShaderStream = `
+    ${common}
+
+    void main() {
+        vec2 uv = vPosition.xy;
+        vec2 px = pixelate(uv, 3.0);
+        float t = time;
+
+        vec3 col = vec3(0.05, 0.02, 0.10);
+        col += vec3(0.18, 0.10, 0.40) * (hash12(floor(px * 120.0) + floor(t * 12.0)) * 0.12);
+
+        // Chat: message bars of random length scrolling up, on both sides
+        for (int s = 0; s < 2; s++) {
+            float side = s == 0 ? -1.0 : 1.0;
+            float x = side * px.x;                 // 1 at the outer edge
+            float row = (px.y + t * 0.18) * 14.0;
+            float id = floor(row);
+            float len = 0.08 + 0.14 * hash(vec2(id, float(s)));
+            float inRow = step(0.25, fract(row)) * step(fract(row), 0.75);
+            float bar = inRow * step(0.96 - len, x) * step(x, 0.96);
+            vec3 name = 0.5 + 0.5 * cos(6.2831 * (hash(vec2(id, 9.0 + float(s))) + vec3(0.0, 0.33, 0.67)));
+            float isName = step(x, 0.96 - len + 0.04);
+            col += bar * mix(vec3(0.55, 0.45, 0.75), name, isName) * 0.55;
+        }
+
+        // Scanlines and a slow rolling bar
+        col *= 0.82 + 0.18 * sin(uv.y * resolution.y * 1.2);
+        col += vec3(0.35, 0.25, 0.7) * smoothstep(0.08, 0.0, abs(fract(uv.y * 0.5 - t * 0.15) - 0.5)) * 0.12;
+
+        // LIVE dot, top left
+        float live = smoothstep(0.045, 0.03, length(uv - vec2(-0.86, 0.86)));
+        col = mix(col, vec3(1.0, 0.12, 0.2) * (0.6 + 0.4 * step(0.5, fract(t * 0.8))), live);
+
+        // Screen corners darken
+        col *= 1.0 - 0.35 * dot(uv * 0.7, uv * 0.7);
+
+        gl_FragColor = vec4(col, 1.0);
+    }
+`;
+
+// THE OTHER SIDE, BOTTOM — reading. Shelves of book spines above and below,
+// and dust floating in a beam of light between them.
+export const fragmentShaderLibrary = `
+    ${common}
+
+    vec3 spine(float x, float shelf) {
+        float w = 0.035;
+        float id = floor(x / w);
+        float h = hash(vec2(id, shelf));
+        vec3 c = 0.5 + 0.5 * cos(6.2831 * (h * 0.6 + vec3(0.0, 0.15, 0.3)));
+        c *= vec3(0.55, 0.32, 0.22) + 0.25;
+        return c * (0.35 + 0.35 * hash(vec2(id, shelf + 4.0))) * step(0.08, fract(x / w));
+    }
+
+    void main() {
+        vec2 uv = pixelate(vPosition.xy, 3.0);
+        float t = time;
+
+        vec3 col = vec3(0.03, 0.03, 0.06);
+
+        // Shelves: a row of books along the top and the bottom
+        for (int s = 0; s < 2; s++) {
+            float base = s == 0 ? -1.0 : 0.80;
+            float height = 0.13 + 0.05 * hash(vec2(floor(uv.x / 0.035), float(s) + 1.0));
+            float inBook = step(base, uv.y) * step(uv.y, base + height + 0.02);
+            col = mix(col, spine(uv.x + float(s) * 0.4, float(s)), inBook);
+            col += vec3(0.25, 0.14, 0.06) * smoothstep(0.012, 0.0, abs(uv.y - base - (s == 0 ? 0.2 : -0.005)));
+        }
+
+        // A beam of light from the top right
+        float beam = smoothstep(0.35, 0.0, abs((uv.x - 0.2) + (uv.y - 0.2) * 0.6));
+        col += vec3(0.30, 0.24, 0.14) * beam * 0.35;
+
+        // Dust in the beam
+        vec2 p = uv * 26.0 + vec2(sin(t * 0.15) * 0.8, -t * 0.12);
+        vec2 id = floor(p);
+        if (hash12(id) > 0.92) {
+            float d = length(fract(p) - 0.5);
+            col += vec3(1.0, 0.9, 0.7) * smoothstep(0.15, 0.0, d) * (0.25 + beam * 0.9);
         }
 
         gl_FragColor = vec4(col, 1.0);

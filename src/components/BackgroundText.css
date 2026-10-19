@@ -14,14 +14,8 @@
       box-shadow: inset 0px 0px 20px 20px rgba(0, 0, 0, 0.5);
   }
   
-  .background-text .function-name {
-    color: rgba(56,174,204, 0.5);
-  }
-  
-  .background-text .quality-name {
-    color: rgba(247,37,133,0.5);
-  }
-  
-  .background-text .technology-name {
-    color: rgba(40,228,178,0.5);
-  }
+  /* Words surfacing in the wall, one colour per kind (see backgroundWords.js) */
+  .background-text .bg-word--cyan { color: rgba(56, 174, 204, 0.5); }
+  .background-text .bg-word--pink { color: rgba(247, 37, 133, 0.5); }
+  .background-text .bg-word--mint { color: rgba(40, 228, 178, 0.5); }
+  .background-text .bg-word--gold { color: rgba(255, 200, 60, 0.5); }

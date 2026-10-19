@@ -1,0 +1,292 @@
+/* ---------- Fonts (SIL Open Font License, see public/fonts) ---------- */
+@font-face {
+  font-family: 'Anton';
+  src: url('/fonts/anton-latin-400-normal.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Barlow';
+  src: url('/fonts/barlow-latin-400-normal.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Barlow';
+  src: url('/fonts/barlow-latin-600-normal.woff2') format('woff2');
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Barlow';
+  src: url('/fonts/barlow-latin-700-normal.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Barlow Condensed';
+  src: url('/fonts/barlow-condensed-latin-600-normal.woff2') format('woff2');
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Barlow Condensed';
+  src: url('/fonts/barlow-condensed-latin-700-normal.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* ---------- Page ---------- */
+.coasters {
+  --ink: #ede9fb;
+  --paper: #120c22;
+  --line: #2a1f45;
+  --line-soft: #211838;
+  --dim: #6e6493;
+  --soft: #a79ec9;
+  --day: #39ff88;
+  --day2: #4dd2ff;
+  --day3: #ffe14d;
+
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #08050f radial-gradient(ellipse 80% 50% at 50% -10%, rgba(177, 78, 255, 0.2), transparent 70%) no-repeat;
+  color: var(--ink);
+  font: 16px/1.55 Barlow, -apple-system, system-ui, sans-serif;
+  animation: coasters-in 0.35s ease-out;
+}
+@keyframes coasters-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .coasters, .coasters * { animation: none !important; transition: none !important; }
+}
+
+.coasters__close {
+  position: fixed;
+  z-index: 2;
+  top: 12px;
+  right: 12px;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(18, 12, 34, 0.85);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.coasters__close:hover { box-shadow: inset 0 0 0 1px var(--day3); color: var(--day3); }
+.coasters button:focus-visible { outline: 2px solid var(--day3); outline-offset: 2px; }
+
+.coasters__page {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding-bottom: 2.5rem;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  box-shadow: 0 0 60px -20px rgba(57, 255, 136, 0.55);
+}
+
+/* ---------- Header ---------- */
+.coasters__top {
+  padding: 2.6rem 1.5rem 1.9rem;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(57, 255, 136, 0.12), transparent);
+}
+.coasters__kick {
+  margin: 0;
+  font: 700 0.85rem 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--day);
+  text-shadow: 0 0 14px rgba(57, 255, 136, 0.7);
+}
+.coasters__top h1 {
+  margin: 0.5rem 0 0;
+  font: 400 clamp(2.4rem, 11vw, 4rem) / 0.88 Anton, sans-serif;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.35), 0 0 34px rgba(57, 255, 136, 0.85);
+}
+.coasters__top h1 em {
+  font-style: normal;
+  color: transparent;
+  -webkit-text-stroke: 2px var(--day);
+  text-shadow: 0 0 26px rgba(57, 255, 136, 0.8);
+}
+.coasters__lead { margin: 0.9rem 0 0; font-size: 0.95rem; line-height: 1.6; color: #9e95c4; }
+
+/* ---------- Filters and sorting ---------- */
+.coasters__controls { padding: 1.15rem 1.5rem; border-bottom: 1px solid var(--line-soft); }
+.coasters__lbl {
+  margin: 0 0 0.55rem;
+  font: 700 0.72rem 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.coasters__lbl--next { margin-top: 1.15rem; }
+.coasters__chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.coasters__chips button {
+  padding: 0.28rem 0.62rem;
+  border: 0;
+  background: none;
+  font: 700 0.79rem 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--dim);
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px var(--line);
+  transition: 0.14s;
+}
+.coasters__chips button:hover { color: var(--ink); box-shadow: inset 0 0 0 1px #43356b; }
+.coasters__chips button[aria-pressed='true'] {
+  color: var(--c, var(--day));
+  box-shadow: inset 0 0 0 1px var(--c, var(--day)), 0 0 16px -4px var(--c, var(--day));
+}
+.coasters__dir { margin-left: 0.25rem; font-size: 0.7em; opacity: 0.8; }
+.coasters__filter {
+  margin: 1rem 0 0;
+  font: 700 0.8rem 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--day3);
+}
+.coasters__filter button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: var(--ink);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ---------- One row, one coaster ---------- */
+.coasters__list { margin: 0; padding: 0; list-style: none; }
+.coasters__ride {
+  display: grid;
+  grid-template-columns: 3.2rem 1fr;
+  gap: 1rem;
+  align-items: start;
+  padding: 1.05rem 1.5rem;
+  border-bottom: 1px solid var(--line-soft);
+}
+.coasters__n {
+  font: 400 2.1rem/0.82 Anton, sans-serif;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--c);
+  text-shadow: 0 0 20px color-mix(in srgb, var(--c) 45%, transparent);
+}
+.coasters__ride h3 {
+  margin: 0;
+  font: 400 1.24rem/1.06 Anton, sans-serif;
+  text-transform: uppercase;
+  color: #fff;
+}
+.coasters__meta {
+  margin: 0 0 0.22rem;
+  font: 700 0.86rem 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.coasters__meta b { color: var(--day2); }
+.coasters__meta i { font-style: normal; color: var(--c); }
+.coasters__wood {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.06rem 0.38rem;
+  vertical-align: 0.2rem;
+  font: 700 0.68rem 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.14em;
+  background: var(--day3);
+  color: #08050f;
+  box-shadow: 0 0 16px -5px var(--day3);
+}
+.coasters__gauge { position: relative; height: 1.35rem; margin-top: 0.55rem; box-shadow: inset 0 0 0 1px var(--line); }
+.coasters__gauge i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: color-mix(in srgb, var(--c) 26%, transparent);
+  box-shadow: inset 0 0 0 1px var(--c), 0 0 20px -6px var(--c);
+}
+.coasters__gauge span {
+  position: relative;
+  display: block;
+  padding-left: 0.45rem;
+  font: 700 0.82rem/1.35rem 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.1em;
+  color: #fff;
+}
+.coasters__gauge.is-none i { display: none; }
+.coasters__gauge.is-none span { color: var(--dim); }
+.coasters__stats {
+  margin: 0.42rem 0 0;
+  font: 600 0.85rem 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.05em;
+  color: var(--dim);
+}
+.coasters__stats span { color: var(--soft); }
+
+/* ---------- Manufacturers ---------- */
+.coasters__act {
+  margin: 0;
+  padding: 0.8rem 1.5rem;
+  border-bottom: 1px solid var(--line);
+  font: 700 0.85rem 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--day3);
+  text-shadow: 0 0 16px rgba(255, 225, 77, 0.55);
+}
+.coasters__makers { padding: 1.2rem 1.5rem; overflow-x: auto; }
+.coasters table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.coasters th,
+.coasters td { padding: 0.45rem 0.4rem; border-bottom: 1px solid var(--line-soft); text-align: left; color: var(--soft); }
+.coasters th {
+  font: 700 0.76rem 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.coasters .num { text-align: right; font-variant-numeric: tabular-nums; }
+.coasters td.num { font-weight: 600; color: var(--ink); }
+.coasters tbody tr { cursor: pointer; }
+.coasters tbody tr:hover td { color: var(--ink); }
+.coasters tbody tr[aria-selected='true'] td:first-child { box-shadow: inset 4px 0 0 var(--day3); }
+.coasters td.maker button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: 700 0.94rem 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--day2);
+  cursor: pointer;
+}
+
+.coasters__note { padding: 1.2rem 1.5rem; border-top: 1px solid var(--line); background: #180f2e; }
+.coasters__note p { margin: 0.45rem 0 0; font-size: 0.89rem; line-height: 1.62; color: var(--soft); }
+.coasters__note p:first-child { margin-top: 0; }
+.coasters__note b { color: var(--ink); }
+
+@media (max-width: 430px) {
+  .coasters__ride { grid-template-columns: 2.6rem 1fr; gap: 0.75rem; padding: 0.95rem 1rem; }
+  .coasters__n { font-size: 1.8rem; }
+  .coasters__top,
+  .coasters__note,
+  .coasters__act,
+  .coasters__controls,
+  .coasters__makers { padding-left: 1rem; padding-right: 1rem; }
+  .coasters__top { padding-top: 3.4rem; }
+}
