@@ -59,24 +59,28 @@ export const domains = {
       {
         id: 'evolving-boids',
         name: 'Evolving Boids',
-        year: '2023',
-        tech: ['Angular', 'TypeScript', 'SASS', 'Quadtree'],
-        url: 'https://sylvainlano.github.io/EvolvingBoids/index.html',
+        year: '2023–2026',
+        tech: ['Angular 22', 'TypeScript', 'Canvas 2D', 'Quadtree'],
+        url: 'https://sylvainlano.github.io/EvolvingBoids/',
         image: 'projects/evolving-boids.webp',
-        imageAlt: 'Flocks of blue boids and red predators over the quadtree grid that splits where they gather',
-        summary: 'Flocking prey and predators that evolve.',
+        imageAlt: 'Night Hunt, from the cinema mode: flocks of neon comets in blue, green and pink trailing light over a black grid',
+        summary: 'A living ecosystem of flocks and predators that evolve.',
         sections: [
           {
             title: 'Why',
             text: 'Craig Reynolds\u2019 boids fascinated me: birds and fish move in 3D, yet three simple rules in 2D capture how they behave.',
           },
           {
-            title: 'The challenge',
-            text: 'Hundreds of entities in a browser tab, thanks to a quadtree. Tuning it was the real work: cells split at 24 boids, merge below 6, and spawning pauses under 20 FPS.',
+            title: 'What it became',
+            text: 'Version 1.6 is a whole ecosystem: plankton and algae to graze, seasons with harsh winters, predators that tire of a fruitless chase, and genes for speed, fertility, vision, focus and agility that natural selection really moves. Six challenges, live charts, and an Explain mode that tells what is happening on screen.',
+          },
+          {
+            title: 'Night Hunt',
+            text: 'The cinema mode turns it into a screensaver: scenes in their own ambiance, filmed by a camera that follows the flocks. Night Hunt, neon comets on a black grid, is the one in the banner.',
           },
           {
             title: 'What\u2019s next',
-            text: 'Speed and reproduction rate can mutate, but the evolution the title promises is still hard to see. That is where I would push next.',
+            text: 'An arcade mode, with explosions and trapped fish, and more skins for the boids.',
           },
         ],
       },
@@ -338,6 +342,31 @@ export const domains = {
           {
             title: 'Where it stands',
             text: 'In development, and already playable.',
+          },
+        ],
+      },
+      {
+        id: 'clicker-stories',
+        name: 'Clicker Stories',
+        year: '2023–2026',
+        tech: ['JavaScript', 'Vite', 'CSS'],
+        url: 'https://sylvainlano.github.io/clicker-stories/',
+        linkLabel: 'Play Clicker Stories',
+        image: 'projects/clicker-stories.webp',
+        imageAlt: 'The title Clicker Stories in pixel letters over a painted valley at dusk, under a sky of shooting stars',
+        summary: 'A clicker game that writes stories.',
+        sections: [
+          {
+            title: 'The idea',
+            text: 'A clicker where clicking doesn\u2019t just raise a number, it writes a story: each click types a few more characters, a word at a time at first, then a whole flow. Each chapter has its own painting, music, cursor and buttons.',
+          },
+          {
+            title: 'From Java to the browser',
+            text: 'I wrote it in 2023 in Java with JavaFX. It grew hard to run and finally stopped building, so I am porting it to plain JavaScript: open a link and play.',
+          },
+          {
+            title: 'Where it stands',
+            text: 'The port is under way, at version 0.5: not everything from the original game is back yet.',
           },
         ],
       },
